@@ -19,7 +19,6 @@ func main() {
 	fmt.Printf("\nSSH Key Created")
 
 	c := deploy.CenturyLink{
-		PrivateSSHKey:  pk,
 		PublicSSHKey:   puk,
 		APIUsername:    os.Getenv("USERNAME"),
 		APIPassword:    os.Getenv("PASSWORD"),
@@ -38,8 +37,8 @@ func main() {
 		panic(e)
 	}
 
-	//utils.SetKey("AGENT_PRIVATE_KEY", base64.StdEncoding.EncodeToString([]byte(pk)))
-	utils.SetKey("AGENT_PUBLIC_KEY", base64.StdEncoding.EncodeToString([]byte(puk)))
+	utils.SetKey("AGENT_PRIVATE_KEY", base64.StdEncoding.EncodeToString([]byte(pk)))
+	//utils.SetKey("AGENT_PUBLIC_KEY", base64.StdEncoding.EncodeToString([]byte(puk)))
 	utils.SetKey("AGENT_PUBLIC_IP", s.PublicIP)
 
 	line := ""

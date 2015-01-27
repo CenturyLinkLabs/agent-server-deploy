@@ -25,7 +25,7 @@ func main() {
 		GroupID:        os.Getenv("GROUP_ID"),
 		CPU:            1,
 		MemoryGB:       1,
-		TCPOpenPorts:   []int{3036, 8080},
+		TCPOpenPorts:   []int{3001, 8080},
 		ServerName:     "AGENT",
 		ServerTemplate: "UBUNTU-14-64-TEMPLATE",
 	}

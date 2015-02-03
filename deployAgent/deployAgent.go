@@ -19,7 +19,7 @@ func main() {
 		}
 	}()
 
-	utils.LogInfo("\nDeploying Agent Server")
+	utils.LogInfo("\nDeploying Agent Server...")
 
 	var ln string
 	var e error
@@ -56,7 +56,7 @@ func main() {
 		ServerTemplate: "UBUNTU-14-64-TEMPLATE",
 	}
 
-	utils.LogInfo("\nWaiting for server creation")
+	utils.LogInfo("\nWaiting for server creation...")
 	s, e := c.DeployVM()
 
 	if e != nil {

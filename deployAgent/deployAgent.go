@@ -4,11 +4,10 @@ import (
 	"bufio"
 	"encoding/base64"
 	"fmt"
-	"github.com/CenturyLinkLabs/kube-cluster-deploy/deploy"
-	"github.com/CenturyLinkLabs/kube-cluster-deploy/utils"
+	"github.com/CenturylinkLabs/kube-cluster-deploy/utils"
 	"os"
 	"strings"
-)
+    "github.com/CenturylinkLabs/agent-server-deploy/provider")
 
 func main() {
 
@@ -35,36 +34,22 @@ func main() {
 		}
 	}
 
-	if !strings.ContainsAny(ln, "AGENT_KUBER_API") {
+    kv := strings.Split(ln, "=")
+	if !strings.ContainsAny(ln, "AGENT_KUBER_API") || len(kv) == 0{
 		panic("Missing Key, AGENT_KUBER_API. Cannot proceed.")
 	}
-
-	kv := strings.Split(ln, "=")
 	utils.SetKey("AGENT_KUBER_API", kv[1])
 
-	pk, puk, _ := utils.CreateSSHKey()
+    utils.LogInfo("\nStarting Agent installation")
+    cp := provider.New("amazon")
+    s, e := cp.ProvisionAgent()
 
-	c := deploy.CenturyLink{
-		PublicSSHKey:   puk,
-		APIUsername:    os.Getenv("USERNAME"),
-		APIPassword:    os.Getenv("PASSWORD"),
-		GroupID:        os.Getenv("GROUP_ID"),
-		CPU:            1,
-		MemoryGB:       1,
-		TCPOpenPorts:   []int{3001},
-		ServerName:     "AGENT",
-		ServerTemplate: "UBUNTU-14-64-TEMPLATE",
-	}
+    if e != nil {
+        panic(e)
+    }
 
-	utils.LogInfo("\nWaiting for server creation")
-	s, e := c.DeployVM()
+    utils.SetKey("AGENT_PRIVATE_KEY", base64.StdEncoding.EncodeToString([]byte(s.PrivateSSHKey)))
+    utils.SetKey("AGENT_PUBLIC_IP", s.PublicIP)
 
-	if e != nil {
-		panic(e)
-	}
-
-	utils.SetKey("AGENT_PRIVATE_KEY", base64.StdEncoding.EncodeToString([]byte(pk)))
-	utils.SetKey("AGENT_PUBLIC_IP", s.PublicIP)
-
-	utils.LogInfo("\nAgent server deployment complete!!")
+    utils.LogInfo("\nAgent server deployment complete!!")
 }

@@ -30,7 +30,8 @@ func(amz Amazon) ProvisionAgent() (deploy.CloudServer, error) {
     pk, puk, _ := utils.CreateSSHKey()
 
     c := deploy.Amazon{}
-    c.AmiName = "ami-29ebb519"
+    c.AmiName = "ubuntu-trusty-14.04-amd64-server"
+    c.AmiOwnerId = "099720109477"
     c.ApiAccessKey = apiK
     c.ApiKeyID = apiID
     c.Location = loc

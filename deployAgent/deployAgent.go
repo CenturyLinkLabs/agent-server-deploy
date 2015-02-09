@@ -18,7 +18,7 @@ func main() {
 		}
 	}()
 
-	utils.LogInfo("\nDeploying Agent Server")
+	utils.LogInfo("\nDeploying Agent Server...")
 
 	var ln string
 	var e error

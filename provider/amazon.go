@@ -1,20 +1,24 @@
 package provider
-import "github.com/CenturylinkLabs/kube-cluster-deploy/deploy"
-import "github.com/CenturylinkLabs/kube-cluster-deploy/utils"
-import "os"
-import "errors"
-import "encoding/base64"
+
+import (
+    "github.com/CenturylinkLabs/kube-cluster-deploy/deploy"
+    "github.com/CenturylinkLabs/kube-cluster-deploy/utils"
+    "os"
+    "errors"
+    "encoding/base64"
+    "fmt")
 
 type Amazon struct {
 
 }
 
 func NewAmazon() CloudProvider {
+    fmt.Printf("Adding amazon")
     c := Amazon{}
     return c
 }
 
-func(amz Amazon) ProvisionAgent() (deploy.CloudServer, error) {
+func (amz Amazon) ProvisionAgent() (deploy.CloudServer, error) {
 
     utils.LogInfo("\nDeploying Panamax remote agent in Amazon EC2")
 
@@ -23,7 +27,7 @@ func(amz Amazon) ProvisionAgent() (deploy.CloudServer, error) {
     loc := os.Getenv("REGION")
 
     if apiID == "" || apiK == "" || loc == "" {
-        return deploy.CloudServer{},  errors.New("\n\nMissing Params Or No Matching AMI found...Check Docs...\n\n")
+        return deploy.CloudServer{}, errors.New("\n\nMissing Params Or No Matching AMI found...Check Docs...\n\n")
     }
 
     var pk, puk, kn string
@@ -32,6 +36,7 @@ func(amz Amazon) ProvisionAgent() (deploy.CloudServer, error) {
         s2, _ := base64.StdEncoding.DecodeString(os.Getenv("MASTER_PUBLIC_KEY"))
         pk = string(s1)
         puk = string(s2)
+        //kn = os.Getenv("AMAZON_SSH_KEY_NAME")
     } else {
         utils.LogInfo("\nCreating New Keys")
         pk, puk, _ = utils.CreateSSHKey()
@@ -44,22 +49,16 @@ func(amz Amazon) ProvisionAgent() (deploy.CloudServer, error) {
     c.ApiKeyID = apiID
     c.Location = loc
     c.PrivateKey = pk
+    c.PublicKey = puk
     c.ServerCount = 1
     c.TCPOpenPorts = []int{3001}
+    c.ServerNames = []string{"Agent"}
     c.VMSize = "t2.micro"
-
-    if kn == "" {
-        var e error
-        kn, e = c.ImportKey(puk)
-        if e != nil {
-            return deploy.CloudServer{}, e
-        }
-    }
     c.SSHKeyName = kn
 
     s, e := c.DeployVMs()
     if e != nil {
-        return deploy.CloudServer{}  , e
+        return deploy.CloudServer{}, e
     }
 
     s[0].PublicSSHKey = puk
